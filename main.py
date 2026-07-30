@@ -172,32 +172,32 @@ def cmd_set_proxy(args):
 
 
 def cmd_export(args):
-    if not hasattr(config, 'RESULTS_JSON_FILE') or not __import__('os').path.exists(config.RESULTS_JSON_FILE):
-        try:
-            with open(config.RESULTS_JSON_FILE) as f:
-                import json
-                data = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            print("[!] No test results found. Run 'python main.py test' first.")
-            return
-
-        results = []
-        for d in data:
-            results.append({
-                "addr": d["proxy"],
-                "protocol": d.get("protocol", "HTTP"),
-                "ok": d.get("status") == "ONLINE",
-                "ms": d.get("latency"),
-                "avg_ms": d.get("avg_ms"),
-                "min_ms": d.get("min_ms"),
-                "max_ms": d.get("max_ms"),
-                "country": d.get("country", ""),
-                "method": d.get("method", ""),
-                "info": d.get("info", ""),
-            })
-    else:
-        print("[!] No test results found.")
+    if not os.path.exists(config.RESULTS_JSON_FILE):
+        print("[!] No test results found. Run 'python main.py test' first.")
         return
+
+    try:
+        with open(config.RESULTS_JSON_FILE) as f:
+            import json
+            data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        print("[!] No test results found. Run 'python main.py test' first.")
+        return
+
+    results = []
+    for d in data:
+        results.append({
+            "addr": d["proxy"],
+            "protocol": d.get("protocol", "HTTP"),
+            "ok": d.get("status") == "ONLINE",
+            "ms": d.get("latency"),
+            "avg_ms": d.get("avg_ms"),
+            "min_ms": d.get("min_ms"),
+            "max_ms": d.get("max_ms"),
+            "country": d.get("country", ""),
+            "method": d.get("method", ""),
+            "info": d.get("info", ""),
+        })
 
     online = sorted(
         [r for r in results if r.get("ok")],
