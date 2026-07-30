@@ -64,9 +64,8 @@ Test all imported proxies.
 python main.py test                          # Test all, 1 request each
 python main.py test --retry 5                # 5 requests per proxy (accurate avg)
 python main.py test --top 10 --working       # Test + save 10 fastest
-python main.py test --protocol HTTP          # HTTP proxies only
-python main.py test --country "United States of America"  # USA proxies only (quotes! contains spaces)
-python main.py test --retry 3 --top 5 --working --protocol HTTPS --country Germany
+python main.py test --protocol HTTP --country "United States of America"  # USA proxies only (quotes! contains spaces)
+python main.py test --limit 5 --retry 3 --top 3 --working  # Limit 5 proxy pertama
 python main.py test --target "https://www.hostgator.com.br/"  # Custom target
 python main.py test --target "https://example.com/page?id=1" --retry 5 --top 10  # SQLi target
 ```
@@ -76,6 +75,7 @@ python main.py test --target "https://example.com/page?id=1" --retry 5 --top 10 
 | Flag | Description |
 |------|-------------|
 | `--limit=N` | Only test the first N proxies from the list (takes from top of file). Useful for quick checks. |
+| `file` (export) | Save export to a custom JSON file instead of default CSV/working. Example: `hasil.json` |
 | `--retry=N` | Send N requests per proxy. Shows min/avg/max. Default: 1. Higher = more accurate but slower. |
 | `--top=N` | Only show and export the N fastest proxies. Automatically generates `proxies.working.json`. |
 | `--working` | Generate `proxies.working.json` with all online proxies sorted by speed. |
@@ -92,13 +92,15 @@ PROXY                PROTO  COUNTRY    STATUS   MIN      AVG      MAX      OK   
 65.111.24.175:3129   HTTP   Germany    ONLINE   601 ms   670 ms   792 ms   10/10  HTTP 200
 ```
 
-### `python main.py export [--top=N]`
+### `python main.py export [file] [--top=N]`
 
-Re-export results from the last test without re-testing.
+Display and export results from the last test without re-testing.
 
 ```bash
-python main.py export          # Export all results
-python main.py export --top 5  # Export 5 fastest only
+python main.py export                    # Display all online + export to CSV/working
+python main.py export --top 5            # Display top 5 + export to CSV/working
+python main.py export hasil.json         # Save all online to hasil.json
+python main.py export hasil.json --top 5 # Save top 5 to hasil.json
 ```
 
 ## Output files
