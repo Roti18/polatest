@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.txt
+
+proxies.json
+proxies.working.json
+results.json
+results.csv
+
+.DS_Store
+Thumbs.db
+*.log
