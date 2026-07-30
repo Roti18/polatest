@@ -52,6 +52,7 @@ def cmd_test(args, socks_mod):
 
     retry_count = max(1, args.retry)
     top_n = args.top
+    target_url = args.target or config.TEST_URL
 
     if args.protocol:
         proxies = [p for p in proxies if p["protocol"].upper() == args.protocol.upper()]
@@ -72,11 +73,11 @@ def cmd_test(args, socks_mod):
         print(f"  {_YLW}Mode: top {top_n} fastest only{_RESET}")
     print(_CYN2 + _BAR * 90 + _RESET)
 
-    print(f"  {_DIM}Loaded {len(proxies)} proxies | {config.MAX_WORKERS} threads | {config.TIMEOUT}s timeout | {retry_count}x retry{_RESET}")
+    print(f"  {_DIM}Loaded {len(proxies)} proxies | {config.MAX_WORKERS} threads | {config.TIMEOUT}s timeout | {retry_count}x retry | target: {target_url}{_RESET}")
 
     results = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=config.MAX_WORKERS) as ex:
-        futures = {ex.submit(tester.test_one_retry, p, socks_mod, retry_count): p for p in proxies}
+        futures = {ex.submit(tester.test_one_retry, p, socks_mod, retry_count, target_url): p for p in proxies}
         for fut in concurrent.futures.as_completed(futures):
             results.append(fut.result())
 
@@ -267,6 +268,7 @@ EXAMPLES:
     p_test.add_argument("--working", action="store_true", help="Generate proxies.working.json with all online proxies sorted by speed.")
     p_test.add_argument("--protocol", help='Filter by protocol before testing. Valid: HTTP, HTTPS, SOCKS4, SOCKS5. Example: --protocol HTTP')
     p_test.add_argument("--country", help='Filter by country before testing. Use quotes for multi-word names, e.g. --country "United States of America"')
+    p_test.add_argument("--target", help='Test against a custom URL instead of httpbin.org. Example: --target https://www.hostgator.com.br/')
 
     p_set = sub.add_parser("set-proxy", help="Import proxies from text or file", epilog=EPILOG, formatter_class=argparse.RawDescriptionHelpFormatter)
     p_set.add_argument("file", nargs="?", default=None,
