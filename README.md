@@ -10,6 +10,7 @@ Test real proxy latency with actual HTTP requests. Supports HTTP/HTTPS and SOCKS
 - **Retry** (`--retry=N`) — hits each proxy N times for accurate min/avg/max latency.
 - **Top** (`--top=N`) — only keep the N fastest proxies. Auto-saves to `proxies.working.json`.
 - **Working** (`--working`) — generates `proxies.working.json` with online proxies sorted by speed.
+- **Custom target** (`--target=URL`) — test proxies against any URL instead of httpbin.org.
 - **Filter** (`--protocol`, `--country`) — test only a subset of proxies.
 - **Bulk import** — paste raw text or load a file. Auto-detects block format and raw line format.
 
@@ -66,6 +67,8 @@ python main.py test --top 10 --working       # Test + save 10 fastest
 python main.py test --protocol HTTP          # HTTP proxies only
 python main.py test --country "United States of America"  # USA proxies only (quotes! contains spaces)
 python main.py test --retry 3 --top 5 --working --protocol HTTPS --country Germany
+python main.py test --target "https://www.hostgator.com.br/"  # Custom target
+python main.py test --target "https://example.com/page?id=1" --retry 5 --top 10  # SQLi target
 ```
 
 #### Flags
@@ -77,6 +80,7 @@ python main.py test --retry 3 --top 5 --working --protocol HTTPS --country Germa
 | `--working` | Generate `proxies.working.json` with all online proxies sorted by speed. |
 | `--protocol=PROTO` | Filter by protocol before testing. Valid: `HTTP`, `HTTPS`, `SOCKS4`, `SOCKS5`. |
 | `--country=NAME` | Filter by country before testing. Case-insensitive. **Wrap in quotes if the name has spaces**, e.g. `--country "United States of America"` |
+| `--target=URL` | Test against a custom URL instead of `httpbin.org`. Example: `--target "https://www.hostgator.com.br/"` |
 
 #### Output with `--retry=5`
 
