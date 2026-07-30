@@ -44,6 +44,14 @@ _BOLD = "" if not _USE_UTF else "\033[1m"
 _RESET = "" if not _USE_UTF else "\033[0m"
 
 
+def _c(val, color):
+    """Wrap value in color, return (display_string, plain_length) buat alignment."""
+    if not _USE_UTF or not color:
+        return val, len(val)
+    colored = f"{color}{val}{_RESET}"
+    return colored, len(val)
+
+
 def cmd_test(args, socks_mod):
     proxies = proxy_db.load()
     if not proxies:
@@ -53,6 +61,10 @@ def cmd_test(args, socks_mod):
     retry_count = max(1, args.retry)
     top_n = args.top
     target_url = args.target or config.TEST_URL
+
+    if args.limit and args.limit > 0 and args.limit < len(proxies):
+        proxies = proxies[:args.limit]
+        print(f"[i] Limited to first {args.limit} proxies")
 
     if args.protocol:
         proxies = [p for p in proxies if p["protocol"].upper() == args.protocol.upper()]
@@ -90,29 +102,26 @@ def cmd_test(args, socks_mod):
         print(f"\n{_DIM}{'PROXY':<22} {'PROTO':<6} {'COUNTRY':<22} {'STATUS':<7} {'MIN':<8} {'AVG':<8} {'MAX':<8} {'OK':<6} INFO{_RESET}")
         print(_DIM + _BAR * 110 + _RESET)
         for r in display:
-            if r["ok"]:
-                status = f"{_GRN}UP{_RESET}"
-                min_ms = f"{r['min_ms']:.0f} ms"
-                avg_ms = f"{_BOLD}{r['avg_ms']:.0f} ms{_RESET}"
-                max_ms = f"{r['max_ms']:.0f} ms"
-                ok_str = f"{r['ok_count']}/{r['retry']}"
-            else:
-                status = f"{_RED2}DOWN{_RESET}"
-                min_ms = "-"; avg_ms = "-"; max_ms = "-"; ok_str = f"0/{r['retry']}"
             country = r.get("country") or "-"
-            print(f"{_DIM}{r['addr']:<22}{_RESET} {r['protocol']:<6} {country:<22} {status:<7} {min_ms:<8} {avg_ms:<8} {max_ms:<8} {ok_str:<6} {r['info']}")
+            addr = r['addr']
+            proto = r['protocol']
+            if r["ok"]:
+                info = r['info']
+                print(f"{_DIM}{addr:<22}{_RESET} {proto:<6} {country:<22} {_GRN}{'UP':<7}{_RESET} {r['min_ms']:.0f} ms  {_BOLD}{r['avg_ms']:.0f} ms{_RESET}  {r['max_ms']:.0f} ms  {r['ok_count']}/{r['retry']:<4} {info}")
+            else:
+                print(f"{_DIM}{addr:<22}{_RESET} {proto:<6} {country:<22} {_RED2}{'DOWN':<7}{_RESET} {'-':<8} {'-':<8} {'-':<8} {f'0/{r["retry"]}':<6} {r['info']}")
     else:
-        print(f"\n{_DIM}{'PROXY':<25} {'PROTO':<6} {'COUNTRY':<22} {'STATUS':<7} {'LATENCY':<8} {'METHOD':<10} INFO{_RESET}")
-        print(_DIM + _BAR * 110 + _RESET)
+        print(f"\n{_DIM}{'PROXY':<22} {'PROTO':<6} {'COUNTRY':<22} {'STATUS':<7} {'LATENCY':<8} INFO{_RESET}")
+        print(_DIM + _BAR * 100 + _RESET)
         for r in display:
-            if r["ok"]:
-                status = f"{_GRN}UP{_RESET}"
-                ms = f"{_BOLD}{r['ms']:.0f} ms{_RESET}" if r["ms"] is not None else "-"
-            else:
-                status = f"{_RED2}DOWN{_RESET}"
-                ms = "-"
             country = r.get("country") or "-"
-            print(f"{_DIM}{r['addr']:<25}{_RESET} {r['protocol']:<6} {country:<22} {status:<7} {ms:<8} {r['method']:<10} {r['info']}")
+            addr = r['addr']
+            proto = r['protocol']
+            if r["ok"]:
+                ms_str = f"{r['ms']:.0f} ms" if r["ms"] is not None else "-"
+                print(f"{_DIM}{addr:<22}{_RESET} {proto:<6} {country:<22} {_GRN}{'UP':<7}{_RESET} {_BOLD}{ms_str:<8}{_RESET} {r['info']}")
+            else:
+                print(f"{_DIM}{addr:<22}{_RESET} {proto:<6} {country:<22} {_RED2}{'DOWN':<7}{_RESET} {'-':<8} {r['info']}")
 
     print(f"\n  {_GRN}Done. {len(online)}/{len(results)} proxies online.{_RESET}")
 
@@ -264,6 +273,7 @@ EXAMPLES:
 
     p_test = sub.add_parser("test", help="Test all proxies", epilog=EPILOG, formatter_class=argparse.RawDescriptionHelpFormatter)
     p_test.add_argument("--retry", type=int, default=1, help="Requests per proxy (default: 1). More retries = more accurate min/avg/max.")
+    p_test.add_argument("--limit", type=int, default=0, help="Only test the first N proxies from the list (takes from top of file).")
     p_test.add_argument("--top", type=int, default=0, help="Only show/save the N fastest proxies. Auto-generates proxies.working.json.")
     p_test.add_argument("--working", action="store_true", help="Generate proxies.working.json with all online proxies sorted by speed.")
     p_test.add_argument("--protocol", help='Filter by protocol before testing. Valid: HTTP, HTTPS, SOCKS4, SOCKS5. Example: --protocol HTTP')
