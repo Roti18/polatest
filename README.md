@@ -75,6 +75,7 @@ python main.py test --target "https://example.com/page?id=1" --retry 5 --top 10 
 
 | Flag | Description |
 |------|-------------|
+| `--limit=N` | Only test the first N proxies from the list (takes from top of file). Useful for quick checks. |
 | `--retry=N` | Send N requests per proxy. Shows min/avg/max. Default: 1. Higher = more accurate but slower. |
 | `--top=N` | Only show and export the N fastest proxies. Automatically generates `proxies.working.json`. |
 | `--working` | Generate `proxies.working.json` with all online proxies sorted by speed. |
