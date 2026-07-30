@@ -24,9 +24,19 @@ def http_proxy_test(proxy, target_url=None):
     })
     opener = urllib.request.build_opener(handler)
 
+    # Header biar mirip browser asli, biar gak kena WAF/403
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Cache-Control": "no-cache",
+    }
+
+    req = urllib.request.Request(url, headers=headers)
+
     start = time.time()
     try:
-        with opener.open(url, timeout=config.TIMEOUT) as resp:
+        with opener.open(req, timeout=config.TIMEOUT) as resp:
             resp.read(200)
             elapsed = (time.time() - start) * 1000
             return True, elapsed, f"HTTP {resp.status}"
@@ -73,9 +83,16 @@ def socks_proxy_test(proxy, socks_mod, target_url=None):
 
     opener = urllib.request.build_opener(SocksHTTPHandler, SocksHTTPSHandler)
 
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+    }
+    req = urllib.request.Request(url, headers=headers)
+
     start = time.time()
     try:
-        with opener.open(url, timeout=config.TIMEOUT) as resp:
+        with opener.open(req, timeout=config.TIMEOUT) as resp:
             resp.read(200)
             elapsed = (time.time() - start) * 1000
             return True, elapsed, f"HTTP {resp.status}"
