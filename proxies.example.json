@@ -1,0 +1,16 @@
+[
+  {
+    "proxy": "209.50.182.178:3129",
+    "protocol": "HTTP",
+    "country": "Germany",
+    "username": "qt5dbprrxxxx",
+    "password": "5g9yqk9n1r0xxxx"
+  },
+  {
+    "proxy": "65.111.24.175:3129",
+    "protocol": "HTTP",
+    "country": "Germany",
+    "username": "qt5dbprrxxxx",
+    "password": "5g9yqk9n1r0xxxx"
+  }
+]
