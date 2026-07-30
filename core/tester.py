@@ -7,10 +7,11 @@ import ssl
 from . import config
 
 
-def http_proxy_test(proxy):
+def http_proxy_test(proxy, target_url=None):
     addr = proxy["addr"]
     user = proxy["username"]
     pwd = proxy["password"]
+    url = target_url or config.TEST_URL
 
     if user and pwd:
         proxy_url = f"http://{user}:{pwd}@{addr}"
@@ -25,7 +26,7 @@ def http_proxy_test(proxy):
 
     start = time.time()
     try:
-        with opener.open(config.TEST_URL, timeout=config.TIMEOUT) as resp:
+        with opener.open(url, timeout=config.TIMEOUT) as resp:
             resp.read(200)
             elapsed = (time.time() - start) * 1000
             return True, elapsed, f"HTTP {resp.status}"
@@ -36,10 +37,11 @@ def http_proxy_test(proxy):
         return False, None, str(e)
 
 
-def socks_proxy_test(proxy, socks_mod):
+def socks_proxy_test(proxy, socks_mod, target_url=None):
     addr = proxy["addr"]
     user = proxy["username"]
     pwd = proxy["password"]
+    url = target_url or config.TEST_URL
     host, port_str = addr.rsplit(":", 1)
     port = int(port_str)
     proto = proxy["protocol"]
@@ -73,7 +75,7 @@ def socks_proxy_test(proxy, socks_mod):
 
     start = time.time()
     try:
-        with opener.open(config.TEST_URL, timeout=config.TIMEOUT) as resp:
+        with opener.open(url, timeout=config.TIMEOUT) as resp:
             resp.read(200)
             elapsed = (time.time() - start) * 1000
             return True, elapsed, f"HTTP {resp.status}"
@@ -84,13 +86,13 @@ def socks_proxy_test(proxy, socks_mod):
         return False, None, str(e)
 
 
-def test_one(proxy, socks_mod=None):
+def test_one(proxy, socks_mod=None, target_url=None):
     if proxy["protocol"] in ("HTTP", "HTTPS"):
-        ok, ms, info = http_proxy_test(proxy)
+        ok, ms, info = http_proxy_test(proxy, target_url)
         method = "HTTP"
     elif proxy["protocol"] in ("SOCKS4", "SOCKS5"):
         if socks_mod:
-            ok, ms, info = socks_proxy_test(proxy, socks_mod)
+            ok, ms, info = socks_proxy_test(proxy, socks_mod, target_url)
             method = proxy["protocol"]
         else:
             host, port_str = proxy["addr"].rsplit(":", 1)
@@ -124,13 +126,13 @@ def test_one(proxy, socks_mod=None):
     }
 
 
-def test_one_retry(proxy, socks_mod, retry_count):
+def test_one_retry(proxy, socks_mod, retry_count, target_url=None):
     latencies = []
     last_info = ""
     ok_count = 0
 
     for _ in range(retry_count):
-        result = test_one(proxy, socks_mod)
+        result = test_one(proxy, socks_mod, target_url)
         if result["ok"]:
             ok_count += 1
             latencies.append(result["ms"])
