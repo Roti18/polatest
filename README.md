@@ -4,15 +4,15 @@ Test real proxy latency with actual HTTP requests. Supports HTTP/HTTPS and SOCKS
 
 ## Features
 
-- **HTTP/HTTPS** — uses Python's built-in urllib. No extra deps.
-- **SOCKS4/SOCKS5** — uses PySocks with per-request sockets (no global monkey-patch). Thread-safe.
-- **Auto venv** — auto-creates `.venv` + installs PySocks on first run. No manual setup.
-- **Retry** (`--retry=N`) — hits each proxy N times for accurate min/avg/max latency.
-- **Top** (`--top=N`) — only keep the N fastest proxies. Auto-saves to `proxies.working.json`.
-- **Working** (`--working`) — generates `proxies.working.json` with online proxies sorted by speed.
-- **Custom target** (`--target=URL`) — test proxies against any URL instead of httpbin.org.
-- **Filter** (`--protocol`, `--country`) — test only a subset of proxies.
-- **Bulk import** — paste raw text or load a file. Auto-detects block format and raw line format.
+- **HTTP/HTTPS** - uses Python's built-in urllib. No extra deps.
+- **SOCKS4/SOCKS5** - uses PySocks with per-request sockets (no global monkey-patch). Thread-safe.
+- **Auto venv** - auto-creates `.venv` + installs PySocks on first run. No manual setup.
+- **Retry** (`--retry=N`) - hits each proxy N times for accurate min/avg/max latency.
+- **Top** (`--top=N`) - only keep the N fastest proxies. Auto-saves to `proxies.working.json`.
+- **Working** (`--working`) - generates `proxies.working.json` with online proxies sorted by speed.
+- **Custom target** (`--target=URL`) - test proxies against any URL instead of httpbin.org.
+- **Filter** (`--protocol`, `--country`) - test only a subset of proxies.
+- **Bulk import** - paste raw text or load a file. Auto-detects block format and raw line format.
 
 ## Commands
 
