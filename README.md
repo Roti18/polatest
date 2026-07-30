@@ -34,15 +34,15 @@ python main.py set-proxy
 
 **Block format** (auto-detected):
 ```
-45.3.53.131:3129          <-- ip:port
+123.45.67.89:3129         <-- ip:port
 HTTP                      <-- protocol (optional, default: HTTP)
 Online                    <-- status (skipped)
-Brazil                    <-- country
-qt5dbprrkokv              <-- username (if auth required)
+Germany                   <-- country
+user123                   <-- username (if auth required)
 
-5g9yqk9n1r0vb8f           <-- password (can be in a separate block)
+pass456                   <-- password (can be in a separate block)
 
-45.3.46.70:3129           <-- next proxy
+98.76.54.32:3129          <-- next proxy
 HTTP
 Online
 Canada
